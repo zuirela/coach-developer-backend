@@ -1,0 +1,30 @@
+# render.yaml – Render.com automaattinen deploy-konfiguraatio
+# Tämä tiedosto luo sekä web-palvelun että PostgreSQL-tietokannan
+
+databases:
+  - name: coach-developer-db
+    databaseName: coach_developer
+    user: cdt_user
+    plan: free
+
+services:
+  - type: web
+    name: coach-developer-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        fromDatabase:
+          name: coach-developer-db
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://zuirela.github.io
